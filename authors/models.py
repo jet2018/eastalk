@@ -19,6 +19,7 @@ class Author(models.Model):
         null=True, blank=True, max_length=250)
     job_duration = models.PositiveSmallIntegerField(blank=True, null=True)
     seeking_job = models.BooleanField(default=False)
+    verified_user = models.BooleanField(default=False)
     slug = models.SlugField(unique=True)
 
     def __str__(self):
