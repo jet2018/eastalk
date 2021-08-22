@@ -1,7 +1,11 @@
+import time
 from authors.models import Author
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save, pre_save, post_delete
+from django.utils.text import slugify
+from django.dispatch import receiver
 
 
 class SubCategory(models.Model):
@@ -39,21 +43,25 @@ class Blog(models.Model):
     title = models.CharField(
         max_length=250, help_text="Unique, catchy topic of the article", unique=True, null=True, blank=True)
     body = CKEditor5Field(
-        'Add hotel facilities', help_text="Full body of the article, supports markup", config_name='default', null=True, blank=True)
+        'Add a body', help_text="Full body of the article, supports markup", config_name='default', null=True, blank=True)
     introductory_file = models.FileField(
         upload_to="blog_intros", help_text="Image or video to intoduce the rest of the blog")
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    blog_color = models.CharField(choices=colors, max_length=10)
+    blog_color = models.CharField(
+        choices=colors, null=True, blank=True, max_length=10)
     posted_on = models.DateTimeField(auto_now_add=True)
-    upvotes = models.ManyToManyField(User, related_name="upvoters")
-    downvotes = models.ManyToManyField(User, related_name="downvoters")
+    upvotes = models.ManyToManyField(
+        User, blank=True, related_name="upvoters")
+    downvotes = models.ManyToManyField(
+        User, blank=True, related_name="downvoters")
     slug = models.SlugField(unique=True)
     category = models.ManyToManyField(Category, verbose_name="category")
     sub_category = models.ManyToManyField(
         SubCategory, blank=True, verbose_name="subCategory")
     schedule_to = models.DateField(
         null=True, help_text="If you are want to schedule the blog to a future date.", blank=True)
-    contributors = models.ManyToManyField(Author, related_name="coauthors")
+    contributors = models.ManyToManyField(
+        Author, blank=True, related_name="coauthors")
 
     def __str__(self):
         return self.title
@@ -150,3 +158,10 @@ class ReadArticles(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+# signals
+@ receiver(pre_save, sender=Blog)
+def pre_save_gallery_receiver(sender, instance, *args, **kwargs):
+    instance.slug = slugify(instance.title[:30] +
+                            '-'+str(time.time()))
