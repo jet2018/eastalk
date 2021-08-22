@@ -29,7 +29,4 @@ class BlogListCreateView(generics.ListCreateAPIView):
                         "category__category_name", "sub_category__sub_category_name"]
 
 
-class AuthorCreateView(generics.ListCreateAPIView):
-    model = Author
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = AuthorSerializer
+
