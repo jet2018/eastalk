@@ -41,7 +41,14 @@ class Sponsor(models.Model):
 
 
 # signals
+@ receiver(pre_save, sender=Sponsor)
+def pre_save_sponsor_receiver(sender, instance, *args, **kwargs):
+    instance.slug = slugify(str(time.time()))
+
+# signals
+
+
 @ receiver(pre_save, sender=Author)
-def pre_save_gallery_receiver(sender, instance, *args, **kwargs):
+def pre_save_author_receiver(sender, instance, *args, **kwargs):
     instance.slug = slugify(instance.user.username+"-"+instance.user.first_name +
                             "-"+instance.user.last_name+'-'+str(time.time()))
