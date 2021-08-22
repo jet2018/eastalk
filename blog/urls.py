@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import IndexView
+from .views import BlogListCreateView, IndexView
 
 app_name = "blog"
 urlpatterns = [
-    path('', IndexView.as_view(), name="splash")
+    path('', IndexView.as_view(), name="splash"),
+    path('articles', BlogListCreateView.as_view()),
 ]
