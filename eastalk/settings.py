@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django_ckeditor_5',
     'rest_framework',
     'django_filters',
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
     'blog',
     'authors',
 
@@ -69,6 +72,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -77,8 +82,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'eastalk.wsgi.application'
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 'oauth2_provider.ext.rest_framework.OAuth2Authentication',  # django-oauth-toolkit < 1.0.0
+        # django-oauth-toolkit >= 1.0.0
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+
 }
+
+AUTHENTICATION_BACKENDS = (
+    'rest_framework_social_oauth2.backends.DjangoOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

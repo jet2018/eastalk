@@ -117,6 +117,10 @@ class Notification(models.Model):
 
 
 class Subscribers(models.Model):
+    class Meta:
+        verbose_name = 'Subscriber'
+        verbose_name_plural = 'Subscribers'
+
     """
         User subscription, can be to a specific author, Category, whole blog
         Can be for just a month, six, one year or forever!
@@ -143,6 +147,7 @@ class Bookmark(models.Model):
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    bookmarked_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
