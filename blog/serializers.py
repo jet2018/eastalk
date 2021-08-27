@@ -1,17 +1,26 @@
-from blog.models import Blog
+from blog.models import Blog, Category
 from django.core.exceptions import ValidationError
 from rest_framework.fields import ChoiceField, ReadOnlyField
 from django.db.models.base import Model
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
-
+from modules import DisplayNameWritableField
 from django.contrib.auth.models import User
 
-
+# done with getting blogs!
+# TODO: Adding them now
 class BlogSerializer(serializers.ModelSerializer):
     """ 
         Blog serializers
     """
+    sub_category = serializers.StringRelatedField(many=True)
+    category = serializers.StringRelatedField(many=True)
+    total_upvotes = serializers.ReadOnlyField()
+    total_downvotes = serializers.ReadOnlyField()
+    total_comments = serializers.ReadOnlyField()
+    poster_image = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+    blog_color = DisplayNameWritableField()
     class Meta:
         model = Blog  # the model we working on
         fields = '__all__'  # including all fields at ago
@@ -20,3 +29,16 @@ class BlogSerializer(serializers.ModelSerializer):
             'slug',
             'posted_on'
         ]
+    def get_poster_image(self, obj):
+        return obj.author.dp.url if obj.author.dp else "/static/img/img_avatar.png"
+
+    def get_full_name(self, obj):
+        return obj.author.user.username + "" + obj.author.user.first_name + " " + obj.author.user.last_name
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    sub_category = serializers.StringRelatedField(many=True)
+    class Meta:
+        model = Category
+        fields= '__all__'
+

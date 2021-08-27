@@ -1,4 +1,7 @@
 import time
+
+from django.core.validators import validate_image_file_extension
+
 from authors.models import Author
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
@@ -7,11 +10,13 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from django.utils.text import slugify
 from django.dispatch import receiver
 
+from modules import validate_img_extension, validate_image_size
+
 
 class SubCategory(models.Model):
     sub_category_name = models.CharField(max_length=100)
     added_on = models.DateTimeField(auto_now=True)
-
+    icon = models.CharField(default="pi-angle-double-right", max_length=30, help_text="Icons can be picked from https://www.primefaces.org/primevue/showcase-v2/#/icons")
     def __str__(self):
         return self.sub_category_name
 
@@ -24,6 +29,7 @@ class Category(models.Model):
     category_name = models.CharField(max_length=100)
     sub_category = models.ManyToManyField(SubCategory,  blank=True,)
     added_on = models.DateTimeField(auto_now=True)
+    icon = models.CharField(default="pi-angle-double-right", max_length=30, help_text="Icons can be picked from https://www.primefaces.org/primevue/showcase-v2/#/icons")
 
     def __str__(self) -> str:
         return self.category_name
@@ -44,8 +50,8 @@ class Blog(models.Model):
         max_length=250, help_text="Unique, catchy topic of the article", unique=True, null=True, blank=True)
     body = CKEditor5Field(
         'Add a body', help_text="Full body of the article, supports markup", config_name='default', null=True, blank=True)
-    introductory_file = models.FileField(
-        upload_to="blog_intros", help_text="Image or video to intoduce the rest of the blog")
+    introductory_file = models.ImageField(
+        upload_to="blog_intros", null=True, blank=True, help_text="Cover image to introduce the rest of the blog", validators=[validate_image_file_extension, validate_img_extension])
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     blog_color = models.CharField(
         choices=colors, null=True, blank=True, max_length=10)
@@ -54,7 +60,7 @@ class Blog(models.Model):
         User, blank=True, related_name="upvoters")
     downvotes = models.ManyToManyField(
         User, blank=True, related_name="downvoters")
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     category = models.ManyToManyField(Category, verbose_name="category")
     sub_category = models.ManyToManyField(
         SubCategory, blank=True, verbose_name="subCategory")
@@ -65,6 +71,14 @@ class Blog(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def total_upvotes(self):
+        return self.upvotes.count()
+
+    @property
+    def total_downvotes(self):
+        return self.downvotes.count()
 
     @property
     def total_comments(self):
@@ -128,15 +142,7 @@ class Subscribers(models.Model):
         Same as following
 
     """
-    types = [("one", "Singular"), ("two", "Category"),
-             ("three", "Everything"), ]
-    durations = [("one", "One month"), ("two", "Six months"),
-                 ("three", "One year"), ("four", "Life time"), ]
-
-    subscriber_type = models.CharField(choices=types, max_length=15)
     email = models.EmailField()
-    subscription_length = models.CharField(choices=durations, max_length=15)
-
     def __str__(self):
         return self.email
 

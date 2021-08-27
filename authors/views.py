@@ -1,39 +1,23 @@
-from blog.models import Subscribers
-from authors.serializers import AuthorSerializer
-from authors.models import Author
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from django.shortcuts import render
 from rest_framework import generics
-from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from authors.models import Author, Sponsor
+from authors.serializers import AuthorSerializer, MyTokenObtainPairSerializer, UserSerializer, SponsorSerializer
+
+class SponsorListOrCreate(generics.ListCreateAPIView):
+    serializer_class = SponsorSerializer
+    model=Sponsor
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Sponsor.objects.all()
 
 
-@api_view(['POST'])
-def Subscribe(request):
-    """
-        Subscribe to a category, for a while or everything
-
-        Args:
-            duration(optional): If provided, will be set as the timeframe for subscription
-            type(optional): If provided, will be set as the topic being subscribed on
-            email(required): Email subscribing
-    """
-    subscription_length = request.post.get(
-        'duration') if request.post.get('duration') else None
-    subscriber_type = request.post.get(
-        'type') if request.post.get('type') else None
-    if request.post.get('email'):
-        email = request.post.get('email')
-    else:
-        return JsonResponse({"error": "Email is required to subscribe"})
-
-    subscribe = Subscribers(
-        email=email, subscriber_type=subscriber_type, subscription_length=subscription_length)
-    subscribe.save()
-    return Response({"success": "{} subscribed successfully".format(email)})
+class BriefSponsors(generics.ListAPIView):
+    serializer_class = SponsorSerializer
+    model=Sponsor
+    queryset = Sponsor.objects.all()[:3]
 
 
 class AuthorCreateView(generics.ListCreateAPIView):
@@ -43,4 +27,54 @@ class AuthorCreateView(generics.ListCreateAPIView):
     queryset = Author.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        try:
+            Author.objects.get(user=self.request.user)
+            return Response({"error": "You are already a user"}, status=403)
+        except Author.DoesNotExist:
+            serializer.save(user=self.request.user)
+
+class BriefAuthors(generics.ListAPIView):
+    serializer_class = AuthorSerializer
+    model=Author
+    queryset = Author.objects.all()[:3]
+
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    """
+        Override the default behaviour of jwt. Returns username, email, is_author, token_type, exp, jti, user_id
+        Takes up, username and password
+        Request method allowed is post only
+    """
+    serializer_class = MyTokenObtainPairSerializer
+
+
+@api_view(['POST', ])
+def create_account(request):
+    """
+        Create a new user, requires username, email, password, password2, first_name, last_name, role
+    """
+    if request.method == 'POST':
+
+        if request.POST.get('username') != "" and request.POST.get('email') != "" and request.POST.get(
+                'password') != "" and request.POST.get('password2') != "" and request.POST.get(
+            'first_name') != "" and request.POST.get('last_name') != "":
+
+            serializer = UserSerializer(data=request.data)
+            data = {}
+            if serializer.is_valid():
+                user = serializer.save()
+                # if the user is created, update their role, set it to the sent role
+                if user:
+                    data['success'] = "Account created successfully"
+                    data['email'] = user.email
+                    data['username'] = user.username
+                    data['first_name'] = user.first_name
+                    data['last_name'] = user.last_name
+                else:
+                    data['success'] = "An error occured while creating the user"
+            else:
+                data = serializer.errors
+            return Response(data)
+        else:
+            return Response({"error": "Some fields are missing"})
