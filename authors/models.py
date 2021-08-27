@@ -7,12 +7,14 @@ from django.dispatch import receiver
 from django.core.validators import validate_image_file_extension
 from modules import validate_img_extension, validate_image_size
 
+
 class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     short_bio = models.TextField(max_length=500)
     location = models.TextField(
         max_length=300, help_text="street, city/district, region, country")
-    dp = models.ImageField(upload_to="authors", blank=True, null=True, validators=[validate_image_file_extension, validate_img_extension])
+    dp = models.ImageField(upload_to="authors", blank=True, null=True, validators=[
+                           validate_image_file_extension, validate_img_extension])
     profession = models.CharField(
         max_length=200, help_text="Profesional Mathematical Teacher")
     employed = models.BooleanField(default=False)
@@ -24,14 +26,13 @@ class Author(models.Model):
     registered_on = models.DateTimeField(auto_now=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
 
-
     def __str__(self):
         return self.user.username
 
 
-
 class Sponsor(models.Model):
-    renewals = [("none", "Not Applicable"),("month", "Per month"), ("yearly", "Per year")]
+    renewals = [("none", "Not Applicable"),
+                ("month", "Per month"), ("yearly", "Per year")]
     sponsor_name = models.CharField(max_length=100)
     sponsor_logo = models.ImageField(upload_to="Sponsors")
     amount = models.FloatField()
@@ -54,4 +55,5 @@ def pre_save_sponsor_receiver(sender, instance, *args, **kwargs):
 
 @ receiver(pre_save, sender=Author)
 def pre_save_author_receiver(sender, instance, *args, **kwargs):
-    instance.slug = slugify(instance.user.first_name +"-"+instance.user.last_name+'-'+str(time.time()))
+    instance.slug = slugify(instance.user.first_name +
+                            "-"+instance.user.last_name+'-'+str(time.time()))
