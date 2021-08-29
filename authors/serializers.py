@@ -26,8 +26,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             is_author = False
 
         token = super().get_token(user)
+        if is_author:
+            image = user.author.dp.url
+        else:
+            image = "/static/img/img_avatar.png"
         # Add custom claims
         token['username'] = user.username
+        token['image'] = image
         token['email'] = user.email
         token['is_author'] = is_author
         token['first_name'] = user.first_name
@@ -65,39 +70,6 @@ class AuthorSerializer(serializers.ModelSerializer):
         else:
             url = "/static/img/img_avatar.png"
         return url
-
-    def save(self):
-        user = self.context['request'].user
-        print(user)
-        short_bio = self.validated_data['short_bio']
-        location = self.validated_data['location']
-        profession = self.validated_data['profession']
-        dp = self.validated_data['dp']
-        employed = self.validated_data['employed']
-        place_of_employment = self.validated_data['place_of_employment']
-        job_duration = self.validated_data['job_duration']
-        seeking_job = self.validated_data['seeking_job']
-
-        if employed and seeking_job:
-            raise serializers.ValidationError("You can not have a job and be unemployed at the same time")
-        elif seeking_job and (place_of_employment != "" or job_duration != ""):
-            # if the user indicates where they work, and their job duration, mark them as employed and not seeking!
-            seeking_job = False
-            employed = True
-
-        author = Author(
-            user=user,
-            short_bio=short_bio,
-            location=location,
-            dp=dp,
-            profession=profession,
-            employed=employed,
-            place_of_employment=place_of_employment,
-            job_duration=job_duration,
-            seeking_job=seeking_job
-        )
-        author.save()
-        return author
 
 
 class UserSerializer(serializers.ModelSerializer):

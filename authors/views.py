@@ -1,6 +1,6 @@
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -59,8 +59,8 @@ def create_account(request):
     if request.method == 'POST':
 
         if request.POST.get('username') != "" and request.POST.get('email') != "" and request.POST.get(
-            'password') != "" and request.POST.get('password2') != "" and request.POST.get(
-                'first_name') != "" and request.POST.get('last_name') != "":
+                'password') != "" and request.POST.get('password2') != "" and request.POST.get(
+            'first_name') != "" and request.POST.get('last_name') != "":
 
             serializer = UserSerializer(data=request.data)
             data = {}
@@ -92,19 +92,21 @@ def RegisterAsAuthor(request):
         if cur_user.verified_user:
             return Response({"error": "You account is already verified"})
         else:
-            return Response({"error": "You still have an unconfirmed author profile, this may take up to 7 working days"})
+            return Response(
+                {"error": "You still have an unconfirmed author profile, this may take up to 7 working days"})
     except Author.DoesNotExist:
         pass
     short_bio = request.POST.get('short_bio')
     location = request.POST.get("location")
     dp = request.POST.get("image")
     profession = request.POST.get("profession")
-    employed = request.POST.get(
-        "employed") if request.POST.get("employed") else False
+    employed = request.POST.get("employed")
     place_of_employment = request.POST.get("place_of_employment")
     job_duration = request.POST.get("job_duration")
-    seeking_job = request.POST.get(
-        "seeking_job") if request.POST.get("seeking_job") else False
+    seeking_job = request.POST.get("seeking_job")
+
+    print(employed)
+    print(seeking_job)
 
     if employed and seeking_job:
         return Response(
@@ -125,6 +127,6 @@ def RegisterAsAuthor(request):
         job_duration=job_duration,
         seeking_job=seeking_job
     )
-    print(author)
+    # print(author)
     seriliser = AuthorSerializer(author)
-    return Response(seriliser.data)
+    return Response({"created": seriliser.data, "message": "Author created"})

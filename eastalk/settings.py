@@ -11,12 +11,11 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -28,7 +27,6 @@ SECRET_KEY = '+%q$$0$j*wr_5#(*9w@hs5fk0qfxsyg3ib+8+@f7t25-08%(yj'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -84,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'eastalk.wsgi.application'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -120,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
@@ -147,12 +143,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = '/static/'
 
 
 # Django Suit configuration example
@@ -187,7 +177,7 @@ SUIT_CONFIG = {
 
         # Custom app, with models
         {'label': 'Settings', 'icon': 'icon-cog',
-            'models': ('auth.user', 'auth.group')},
+         'models': ('auth.user', 'auth.group')},
 
         # Cross-linked models with custom name; Hide default icon
         {'label': 'Custom', 'icon': None, 'models': (
@@ -204,14 +194,14 @@ SUIT_CONFIG = {
         # Custom app and model with permissions
         {'label': 'Secure', 'permissions': 'auth.add_user', 'models': [
             {'label': 'custom-child',
-                'permissions': ('auth.add_user', 'auth.add_group')}
+             'permissions': ('auth.add_user', 'auth.add_group')}
         ]}
     ),
     # misc
     'LIST_PER_PAGE': 15
 }
 
-
+APPEND_SLASH = False
 customColorPalette = [
     {
         'color': 'hsl(4, 90%, 58%)',
@@ -262,12 +252,12 @@ CKEDITOR_5_CONFIGS = {
         # codeBlock for codes
         'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
                     'code', 'subscript', 'superscript', 'highlight', '|',
-                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                    'bulletedList', 'numberedList', 'todoList', '|', 'blockQuote', 'imageUpload', '|',
                     'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
                     'insertTable', ],
         'image': {
             'toolbar': ['imageTextAlternative', 'imageTitle', '|', 'imageStyle:alignLeft', 'imageStyle:full',
-                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side', '|'],
             'styles': [
                 'full',
                 'side',
@@ -292,18 +282,17 @@ CKEDITOR_5_CONFIGS = {
         'heading': {
             'options': [
                 {'model': 'paragraph', 'title': 'Paragraph',
-                    'class': 'ck-heading_paragraph'},
+                 'class': 'ck-heading_paragraph'},
                 {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1',
-                    'class': 'ck-heading_heading1'},
+                 'class': 'ck-heading_heading1'},
                 {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2',
-                    'class': 'ck-heading_heading2'},
+                 'class': 'ck-heading_heading2'},
                 {'model': 'heading3', 'view': 'h3',
-                    'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+                 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
             ]
         }
     }
 }
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(weeks=2),

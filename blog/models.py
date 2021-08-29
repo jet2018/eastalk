@@ -1,22 +1,23 @@
 import time
 
+from django.contrib.auth.models import User
 from django.core.validators import validate_image_file_extension
+from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.utils.text import slugify
+from django_ckeditor_5.fields import CKEditor5Field
 
 from authors.models import Author
-from django.db import models
-from django_ckeditor_5.fields import CKEditor5Field
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save, post_delete
-from django.utils.text import slugify
-from django.dispatch import receiver
-
-from modules import validate_img_extension, validate_image_size
+from modules import validate_img_extension
 
 
 class SubCategory(models.Model):
     sub_category_name = models.CharField(max_length=100)
     added_on = models.DateTimeField(auto_now=True)
-    icon = models.CharField(default="pi-angle-double-right", max_length=30, help_text="Icons can be picked from https://www.primefaces.org/primevue/showcase-v2/#/icons")
+    icon = models.CharField(default="pi-angle-double-right", max_length=30,
+                            help_text="Icons can be picked from https://www.primefaces.org/primevue/showcase-v2/#/icons")
+
     def __str__(self):
         return self.sub_category_name
 
@@ -27,9 +28,10 @@ class SubCategory(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=100)
-    sub_category = models.ManyToManyField(SubCategory,  blank=True,)
+    sub_category = models.ManyToManyField(SubCategory, blank=True, )
     added_on = models.DateTimeField(auto_now=True)
-    icon = models.CharField(default="pi-angle-double-right", max_length=30, help_text="Icons can be picked from https://www.primefaces.org/primevue/showcase-v2/#/icons")
+    icon = models.CharField(default="pi-angle-double-right", max_length=30,
+                            help_text="Icons can be picked from https://www.primefaces.org/primevue/showcase-v2/#/icons")
 
     def __str__(self) -> str:
         return self.category_name
@@ -44,14 +46,16 @@ class Blog(models.Model):
     """
         Blog table
     """
-    colors = [("r", "danger"), ("s", "succes"),
+    colors = [("r", "danger"), ("s", "success"),
               ("i", "info"), ]
     title = models.CharField(
         max_length=250, help_text="Unique, catchy topic of the article", unique=True, null=True, blank=True)
     body = CKEditor5Field(
-        'Add a body', help_text="Full body of the article, supports markup", config_name='default', null=True, blank=True)
+        'Add a body', help_text="Full body of the article, supports markup", config_name='default', null=True,
+        blank=True)
     introductory_file = models.ImageField(
-        upload_to="blog_intros", null=True, blank=True, help_text="Cover image to introduce the rest of the blog", validators=[validate_image_file_extension, validate_img_extension])
+        upload_to="blog_intros", null=True, blank=True, help_text="Cover image to introduce the rest of the blog",
+        validators=[validate_image_file_extension, validate_img_extension])
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     blog_color = models.CharField(
         choices=colors, null=True, blank=True, max_length=10)
@@ -123,7 +127,7 @@ class Notification(models.Model):
     sender = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=True, null=True, help_text="The current logged in admin")
     body = CKEditor5Field(
-        'Notification body', config_name='extends',  null=True, blank=True)
+        'Notification body', config_name='extends', null=True, blank=True)
     notified_on = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -143,6 +147,7 @@ class Subscribers(models.Model):
 
     """
     email = models.EmailField()
+
     def __str__(self):
         return self.email
 
@@ -172,7 +177,7 @@ class ReadArticles(models.Model):
 
 
 # signals
-@ receiver(pre_save, sender=Blog)
+@receiver(pre_save, sender=Blog)
 def pre_save_gallery_receiver(sender, instance, *args, **kwargs):
     instance.slug = slugify(instance.title[:30] +
-                            '-'+str(time.time()))
+                            '-' + str(time.time()))
