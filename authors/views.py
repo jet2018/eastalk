@@ -130,3 +130,8 @@ def RegisterAsAuthor(request):
     # print(author)
     seriliser = AuthorSerializer(author)
     return Response({"created": seriliser.data, "message": "Author created"})
+
+@api_view(["GET"])
+def GetSubscribers(request):
+    if request.user.is_authenticated:
+        return JsonResponse()

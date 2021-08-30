@@ -2,8 +2,8 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from authors.models import Author
-from .models import Sponsor
+from blog.models import Subscribers
+from .models import Sponsor, Author
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -117,4 +117,9 @@ class UserSerializer(serializers.ModelSerializer):
 class SponsorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sponsor
+        fields = "__all__"
+
+class SubscriberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscribers
         fields = "__all__"
