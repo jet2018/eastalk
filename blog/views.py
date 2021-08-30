@@ -38,6 +38,26 @@ class BlogListCreateView(generics.ListCreateAPIView):
         return Blog.objects.filter(Q(schedule_to__lte=now) | Q(schedule_to=None))
 
 
+class BlogUpdateDeleteRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """
+        Get all articles or create one
+    """
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    lookup_field = "slug"
+    model = Blog
+    serializer_class = BlogSerializer
+    queryset = Blog.objects.all()
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ["title", "author__user__username",
+                     "category__category_name", "sub_category__sub_category_name"]
+    filterset_fields = ["title", "author__user__username",
+                        "category__category_name", "sub_category__sub_category_name"]
+
+    def get_queryset(self):
+        now = datetime.datetime.now()
+        return Blog.objects.filter(Q(schedule_to__lte=now) | Q(schedule_to=None))
+
+
 class MostRecentStories(generics.ListAPIView):
     serializer_class = BlogSerializer
     model = Blog
