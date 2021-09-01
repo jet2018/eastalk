@@ -77,28 +77,29 @@ def Subscribe(request):
     if request.POST.get('email'):
         email = request.POST.get('email')
         try:
-            Subscribers.objects.get(email=email)
-            return JsonResponse({"error": "Email already subscribed"}, status=403)
+            check_1 = Subscribers.objects.get(email=email)
+            check_1.delete()
+            return JsonResponse({"message": "You have unsubscribed successfully"}, status=201)
         except Subscribers.DoesNotExist:
             pass
     else:
-        return JsonResponse({"error": "Email is required to subscribe"}, status=401)
+        return JsonResponse({"message": "Email is required to complete this action"}, status=401)
 
     subscribe = Subscribers(
         email=email)
     subscribe.save()
-    return Response({"success": "{} subscribed successfully".format(email)})
+    return Response({"message": "{} subscribed successfully".format(email)})
 
 
-@api_view(['POST'])
-def Unsubscribe(request):
-    email = request.POST.get("email")
-    try:
-        check_1 = Subscribers.objects.get(email=email)
-        check_1.delete()
-        return JsonResponse({"success": email + " unsubscribed successfully"})
-    except Subscribers.DoesNotExist:
-        return JsonResponse({"error": email + " is not among subscribed emails"})
+# @api_view(['POST'])
+# def Unsubscribe(request):
+#     email = request.POST.get("email")
+#     try:
+#         check_1 = Subscribers.objects.get(email=email)
+#         check_1.delete()
+#         return JsonResponse({"success": email + " unsubscribed successfully"})
+#     except Subscribers.DoesNotExist:
+#         return JsonResponse({"error": email + " is not among subscribed emails"})
 
 
 # done with subscription!
