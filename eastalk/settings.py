@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django_filters',
     'blog',
     'authors',
-
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
