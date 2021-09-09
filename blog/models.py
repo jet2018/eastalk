@@ -139,13 +139,6 @@ class Subscribers(models.Model):
         verbose_name = 'Subscriber'
         verbose_name_plural = 'Subscribers'
 
-    """
-        User subscription, can be to a specific author, Category, whole blog
-        Can be for just a month, six, one year or forever!
-
-        Same as following
-
-    """
     email = models.EmailField()
 
     def __str__(self):

@@ -69,11 +69,7 @@ class MostRecentStories(generics.ListAPIView):
 
 @api_view(['POST'])
 def Subscribe(request):
-    """
-        Subscribe to a category, for a while or everything
-    """
-    # TODO Subscribe on a specific category
-
+    print(request.POST.get("email"))
     if request.POST.get('email'):
         email = request.POST.get('email')
         try:
@@ -81,14 +77,13 @@ def Subscribe(request):
             check_1.delete()
             return JsonResponse({"message": "You have unsubscribed successfully"}, status=201)
         except Subscribers.DoesNotExist:
-            pass
+            subscribe = Subscribers(
+                email=email
+            )
+            subscribe.save()
+            return Response({"message": "{} subscribed successfully".format(email)})
     else:
         return JsonResponse({"message": "Email is required to complete this action"}, status=401)
-
-    subscribe = Subscribers(
-        email=email)
-    subscribe.save()
-    return Response({"message": "{} subscribed successfully".format(email)})
 
 
 # @api_view(['POST'])

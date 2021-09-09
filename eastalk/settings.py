@@ -14,19 +14,34 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
+import environ
+
+import eastalk.storage_backends
+
+# Initialise environment variables
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+# reading .env file
+environ.Env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+%q$$0$j*wr_5#(*9w@hs5fk0qfxsyg3ib+8+@f7t25-08%(yj'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# False if not in os.environ
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -41,6 +56,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt',
     'rest_framework',
+    'storages',
     'django_filters',
     'blog',
     'authors',
@@ -91,12 +107,11 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -130,6 +145,40 @@ MEDIA_URL = "/media/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "live-static", "media-root")
 
+if not DEBUG:
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, "static"),
+    )
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_CUSTOM_DOMAIN = env('AWS_S3_CUSTOM_DOMAIN')
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+
+    AWS_LOCATION = 'static'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
+    DEFAULT_FILE_STORAGE = env('DEFAULT_FILE_STORAGE')
+    # Allow all host hosts/domain names for this site
+    ALLOWED_HOSTS = ['*']
+
+    # # # Parse database configuration from $DATABASE_URL
+
+    DATABASES = {'default': dj_database_url.config()}
+
+    # # # Honor the 'X-Forwarded-Proto' header for request.is_secure()
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# # # try to load local_settings.py if it exists
+try:
+    from .local_settings import *
+except Exception as e:
+    pass
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -142,7 +191,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Django Suit configuration example
 SUIT_CONFIG = {
@@ -228,10 +276,10 @@ customColorPalette = [
     },
 ]
 
-CKEDITOR_5_CUSTOM_CSS = 'path_to.css'  # optional
+# CKEDITOR_5_CUSTOM_CSS = 'path_to.css'  # optional
 CKEDITOR_5_CONFIGS = {
     'default': {
-        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+        'toolbar': ['heading', '|', 'bold', 'italic', 'code', 'link',
                     'bulletedList', 'numberedList', 'blockQuote', ],
 
     },
@@ -321,3 +369,12 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(weeks=2),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(weeks=3),
 }
+
+# configuring for the email backends
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')

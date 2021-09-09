@@ -32,7 +32,7 @@ class BlogSerializer(serializers.ModelSerializer):
         return obj.author.dp.url if obj.author.dp else "/static/img/img_avatar.png"
 
     def get_full_name(self, obj):
-        return obj.author.user.username + "" + obj.author.user.first_name + " " + obj.author.user.last_name
+        return obj.author.user.username + " " + obj.author.user.first_name + " " + obj.author.user.last_name
 
 
 class CategorySerializer(serializers.ModelSerializer):
