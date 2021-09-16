@@ -103,6 +103,10 @@ class BlogComment(models.Model):
     def total_replies(self):
         return CommentReply.objects.filter(reply_to=self).count()
 
+    @property
+    def commenter(self):
+        return self.user.get_full_name()
+
 
 class CommentReply(models.Model):
     reply_to = models.ForeignKey(BlogComment, on_delete=models.CASCADE)

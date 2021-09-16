@@ -93,7 +93,6 @@ class UserSerializer(serializers.ModelSerializer):
             sent_email = self.validated_data['email']
         else:
             raise serializers.ValidationError({"email": "Email is required"})
-
         try:
             User.objects.get(email=sent_email)
             raise serializers.ValidationError(
@@ -118,6 +117,7 @@ class SponsorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sponsor
         fields = "__all__"
+
 
 class SubscriberSerializer(serializers.ModelSerializer):
     class Meta:

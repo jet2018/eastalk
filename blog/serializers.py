@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from blog.models import Blog, Category
+from blog.models import Blog, BlogComment, Category
 from modules import DisplayNameWritableField
 
 
@@ -41,3 +41,10 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = BlogComment
+        fields = "__all__"

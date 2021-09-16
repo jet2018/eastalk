@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+from django.http.response import JsonResponse
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -51,35 +53,66 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
+# @api_view(['POST', ])
+# def create_account(request):
+#     """
+#         Create a new user, requires username, email, password, password2, first_name, last_name, role
+#     """
+#     if request.method == 'POST':
+
+#         if request.POST.get('username') != "" and request.POST.get('email') != "" and request.POST.get(
+#             'password') != "" and request.POST.get(
+#                 'first_name') != "" and request.POST.get('last_name') != "":
+
+#             serializer = UserSerializer(data=request.data)
+#             data = {}
+#             if serializer.is_valid():
+#                 user = serializer.save()
+#                 # if the user is created, update their role, set it to the sent role
+#                 if user:
+#                     data['success'] = "Account created successfully"
+#                     data['email'] = user.email
+#                     data['username'] = user.username
+#                     data['first_name'] = user.first_name
+#                     data['last_name'] = user.last_name
+#                 else:
+#                     data['success'] = "An error occured while creating the user"
+#             else:
+#                 data = serializer.errors
+#             return Response(data)
+#         else:
+#             return Response({"error": "Some fields are missing"})
+
+
 @api_view(['POST', ])
 def create_account(request):
-    """
-        Create a new user, requires username, email, password, password2, first_name, last_name, role
-    """
     if request.method == 'POST':
+        username = request.POST.get('username')
+        last_name = request.POST.get('last_name')
+        first_name = request.POST.get('first_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
 
-        if request.POST.get('username') != "" and request.POST.get('email') != "" and request.POST.get(
-                'password') != "" and request.POST.get('password2') != "" and request.POST.get(
-            'first_name') != "" and request.POST.get('last_name') != "":
+        check_1 = User.objects.filter(email=email)
+        check_2 = User.objects.filter(username=username)
 
-            serializer = UserSerializer(data=request.data)
-            data = {}
-            if serializer.is_valid():
-                user = serializer.save()
-                # if the user is created, update their role, set it to the sent role
-                if user:
-                    data['success'] = "Account created successfully"
-                    data['email'] = user.email
-                    data['username'] = user.username
-                    data['first_name'] = user.first_name
-                    data['last_name'] = user.last_name
-                else:
-                    data['success'] = "An error occured while creating the user"
-            else:
-                data = serializer.errors
-            return Response(data)
-        else:
-            return Response({"error": "Some fields are missing"})
+        if check_1.exists():
+            return JsonResponse({"error": "Email already taken"})
+        elif check_2.exists():
+            return JsonResponse({"error": "Username already taken"})
+        elif password2 != password:
+            return JsonResponse({"error": "Passwords are not matching"})
+
+        user = User(email=email, username=username,
+                    first_name=first_name, last_name=last_name)
+        user.set_password(password2)
+        user.save()
+        data = dict()
+        data['username'] = user.username
+        data['message'] = "Account created successfully"
+        data['password'] = password2
+        return JsonResponse(data)
 
 
 @api_view(['POST'])
