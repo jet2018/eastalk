@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from blog.models import Blog, BlogComment, Category
+from blog.models import Blog, BlogComment, Category, Subscribers
 from modules import DisplayNameWritableField
 
 
@@ -44,7 +44,17 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = BlogComment
         fields = "__all__"
+
+
+class SubScriber(serializers.ModelSerializer):
+    class Meta:
+        model = Subscribers
+        field = "__all__"
+
+    def save(self):
+        pass
+        #
