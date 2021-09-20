@@ -69,21 +69,20 @@ class MostRecentStories(generics.ListAPIView):
 
 @api_view(['POST'])
 def Subscribe(request):
-    print(request.POST.get("email"))
-    if request.POST.get('email'):
-        email = request.POST.get('email')
+    if request.data["email"]:
+        email = request.data["email"]
         try:
             check_1 = Subscribers.objects.get(email=email)
             check_1.delete()
-            return JsonResponse({"message": "You have unsubscribed successfully"}, status=201)
+            return JsonResponse({"message": "You have unsubscribed successfully"})
         except Subscribers.DoesNotExist:
             subscribe = Subscribers(
                 email=email
             )
             subscribe.save()
-            return Response({"message": "{} subscribed successfully".format(email)})
+            return Response({"message": "{} has been subscribed successfully".format(email)})
     else:
-        return JsonResponse({"message": "Email is required to complete this action"}, status=401)
+        return JsonResponse({"message": "Email is required to complete this action"})
 
 
 # @api_view(['POST'])

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http.response import JsonResponse
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -92,11 +93,10 @@ class UserSerializer(serializers.ModelSerializer):
         if self.validated_data['email']:
             sent_email = self.validated_data['email']
         else:
-            raise serializers.ValidationError({"email": "Email is required"})
+            return JsonResponse({"error": "Email is required"})
         try:
             User.objects.get(email=sent_email)
-            raise serializers.ValidationError(
-                {"Email": "Email already belongs to another account."})
+            return JsonResponse({"error": "Email already belongs to another account."})
         except User.DoesNotExist:
             user = User(
                 email=self.validated_data['email'],
@@ -105,8 +105,7 @@ class UserSerializer(serializers.ModelSerializer):
                 last_name=self.validated_data['last_name'],
             )
             if password != password2:
-                raise serializers.ValidationError(
-                    {'password': 'Passwords are not matching'})
+                return JsonResponse({'error': 'Passwords are not matching'})
 
             user.set_password(password)
             user.save()

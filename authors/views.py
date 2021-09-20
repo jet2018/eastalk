@@ -33,7 +33,7 @@ class AuthorCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         try:
             Author.objects.get(user=self.request.user)
-            return Response({"error": "You are already a user"}, status=403)
+            return Response({"error": "You are already an author"}, status=401)
         except Author.DoesNotExist:
             serializer.save(user=self.request.user)
 
@@ -70,49 +70,56 @@ class MyTokenObtainPairView(TokenObtainPairView):
 #                 user = serializer.save()
 #                 # if the user is created, update their role, set it to the sent role
 #                 if user:
-#                     data['success'] = "Account created successfully"
+#                     data['error'] = "Account created successfully"
 #                     data['email'] = user.email
 #                     data['username'] = user.username
 #                     data['first_name'] = user.first_name
 #                     data['last_name'] = user.last_name
 #                 else:
-#                     data['success'] = "An error occured while creating the user"
+#                     data['error'] = "An error occured while creating the user"
 #             else:
 #                 data = serializer.errors
+#             # print(data)
 #             return Response(data)
 #         else:
 #             return Response({"error": "Some fields are missing"})
 
 
+class GetAllUsers(generics.ListAPIView):
+    serializer_class = UserSerializer
+    model = User
+    queryset = User.objects.all()
+
+
 @api_view(['POST', ])
 def create_account(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        last_name = request.POST.get('last_name')
-        first_name = request.POST.get('first_name')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        password2 = request.POST.get('password2')
+    username = request.data['username']
+    last_name = request.data['last_name']
+    first_name = request.data['first_name']
+    email = request.data['email']
+    password = request.data['password']
+    password2 = request.data['password2']
 
-        check_1 = User.objects.filter(email=email)
-        check_2 = User.objects.filter(username=username)
+    check_1 = User.objects.filter(email=email)
+    check_2 = User.objects.filter(username=username)
 
-        if check_1.exists():
-            return JsonResponse({"error": "Email already taken"})
-        elif check_2.exists():
-            return JsonResponse({"error": "Username already taken"})
-        elif password2 != password:
-            return JsonResponse({"error": "Passwords are not matching"})
+    if check_1.exists():
+        return JsonResponse({"error": "Email already taken"})
+    elif check_2.exists():
+        return JsonResponse({"error": "Username already taken"})
+    elif password2 != password:
+        return JsonResponse({"error": "Passwords are not matching"})
 
-        user = User(email=email, username=username,
-                    first_name=first_name, last_name=last_name)
-        user.set_password(password2)
-        user.save()
-        data = dict()
-        data['username'] = user.username
-        data['message'] = "Account created successfully"
-        data['password'] = password2
-        return JsonResponse(data)
+    user = User(email=email, username=username,
+                first_name=first_name, last_name=last_name)
+
+    user.set_password(password2)
+    user.save()
+    data = dict()
+    data['username'] = user.username
+    data['message'] = "Account created successfully"
+    data['password'] = password2
+    return JsonResponse(data, safe=False)
 
 
 @api_view(['POST'])
