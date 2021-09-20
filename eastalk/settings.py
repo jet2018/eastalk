@@ -174,12 +174,11 @@ if not DEBUG:
 
     # # # Honor the 'X-Forwarded-Proto' header for request.is_secure()
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# # # try to load local_settings.py if it exists
-try:
-    from .local_settings import *
-except Exception as e:
-    pass
+else:
+    try:
+        from .local_settings import *
+    except Exception as e:
+        pass
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -194,63 +193,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Django Suit configuration example
-SUIT_CONFIG = {
-    # header
-    'ADMIN_NAME': 'east',
-    'HEADER_DATE_FORMAT': 'l, j. F Y',
-    'HEADER_TIME_FORMAT': 'H:i',
 
-    # forms
-    'SHOW_REQUIRED_ASTERISK': True,  # Default True
-    'CONFIRM_UNSAVED_CHANGES': True,  # Default True
-
-    # menu
-    'SEARCH_URL': '/admin/auth/user/',
-    'MENU_ICONS': {
-        'sites': 'icon-leaf',
-        'auth': 'icon-lock',
-    },
-    'MENU_OPEN_FIRST_CHILD': True,  # Default True
-    'MENU_EXCLUDE': ('auth.group',),
-    'MENU': (
-
-        # Keep original label and models
-        'sites',
-
-        # Rename app and set icon
-        {'app': 'auth', 'label': 'Authorization', 'icon': 'icon-lock'},
-
-        # Reorder app models
-        {'app': 'auth', 'models': ('user', 'group')},
-
-        # Custom app, with models
-        {'label': 'Settings', 'icon': 'icon-cog',
-         'models': ('auth.user', 'auth.group')},
-
-        # Cross-linked models with custom name; Hide default icon
-        {'label': 'Custom', 'icon': None, 'models': (
-            'auth.group',
-            {'model': 'auth.user', 'label': 'Staff'}
-        )},
-
-        # Custom app, no models (child links)
-        {'label': 'Users', 'url': 'auth.user', 'icon': 'icon-user'},
-
-        # Separator
-        '-',
-
-        # Custom app and model with permissions
-        {'label': 'Secure', 'permissions': 'auth.add_user', 'models': [
-            {'label': 'custom-child',
-             'permissions': ('auth.add_user', 'auth.add_group')}
-        ]}
-    ),
-    # misc
-    'LIST_PER_PAGE': 15
-}
-
-APPEND_SLASH = False
 customColorPalette = [
     {
         'color': 'hsl(4, 90%, 58%)',
