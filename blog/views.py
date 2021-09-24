@@ -1,3 +1,5 @@
+from blog.permissions import IsAuthor
+from authors.models import Author
 import datetime
 
 from django.db.models import Q
@@ -23,7 +25,7 @@ class BlogListCreateView(generics.ListCreateAPIView):
     """
         Get all articles or create one
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthor]
     model = Blog
     serializer_class = BlogSerializer
     queryset = Blog.objects.all()
@@ -36,6 +38,13 @@ class BlogListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         now = datetime.datetime.now()
         return Blog.objects.filter(Q(schedule_to__lte=now) | Q(schedule_to=None))
+
+    def perform_create(self, serializer):
+        if self.request.user.profile.is_author:
+            author_now = Author.objects.get(user=self.request.user)
+            serializer.save(author=author_now)
+        else:
+            return JsonResponse({"error": "You need to be an author to create an article"})
 
 
 class BlogUpdateDeleteRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):

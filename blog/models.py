@@ -65,7 +65,8 @@ class Blog(models.Model):
     downvotes = models.ManyToManyField(
         User, blank=True, related_name="downvoters")
     slug = models.SlugField(unique=True, blank=True, null=True)
-    category = models.ManyToManyField(Category, verbose_name="category")
+    category = models.ManyToManyField(
+        Category, blank=True, verbose_name="category")
     sub_category = models.ManyToManyField(
         SubCategory, blank=True, verbose_name="subCategory")
     schedule_to = models.DateField(
