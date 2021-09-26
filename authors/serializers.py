@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.http.response import JsonResponse
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.conf import settings
 
 from blog.models import Subscribers
 from .models import Sponsor, Author
@@ -27,10 +28,14 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             is_author = False
 
         token = super().get_token(user)
+        if settings.DEBUG:
+            url = "http://localhost:8000"
+        else:
+            url = "https://d3nzp0pknb17lj.cloudfront.net"
         if is_author:
             image = user.author.dp.url
         else:
-            image = "/static/img/img_avatar.png"
+            image = url+"/static/img/img_avatar.png"
         # Add custom claims
         token['username'] = user.username
         token['image'] = image
@@ -65,11 +70,15 @@ class AuthorSerializer(serializers.ModelSerializer):
         return obj.user.first_name + " " + obj.user.last_name+"("+obj.user.username+")"
 
     def get_profile_pik(self, obj):
+        if settings.DEBUG:
+            root = "http://localhost:8000"
+        else:
+            root = "https://d3nzp0pknb17lj.cloudfront.net"
         url = ""
         if obj.dp:
-            url = obj.dp.url
+            url = root+obj.dp.url
         else:
-            url = "/static/img/img_avatar.png"
+            url = root+"/static/img/img_avatar.png"
         return url
 
 
