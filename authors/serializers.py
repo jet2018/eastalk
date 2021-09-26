@@ -31,7 +31,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         if settings.DEBUG:
             url = "http://localhost:8000"
         else:
-            url = "https://eastalk.s3.us-east-2.amazonaws.com"
+            url = settings.STATIC_URL
         if is_author:
             image = user.author.dp.url if user.author.dp else url+"/static/img/img_avatar.png"
         else:
@@ -71,15 +71,11 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def get_profile_pik(self, obj):
         if settings.DEBUG:
-            root = "http://localhost:8000"
+            url = "http://localhost:8000"
         else:
-            root = "https://d3nzp0pknb17lj.cloudfront.net"
-        url = ""
-        if obj.dp:
-            url = root+obj.dp.url
-        else:
-            url = root+"/static/img/img_avatar.png"
-        return url
+            url = settings.STATIC_URL
+
+        return obj.author.dp.url if obj.author.dp else url + "/static/img/img_avatar.png"
 
 
 class UserSerializer(serializers.ModelSerializer):

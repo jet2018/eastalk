@@ -84,7 +84,7 @@ class BlogSerializer(serializers.ModelSerializer):
         if settings.DEBUG:
             url = "http://localhost:8000"
         else:
-            url = "https://eastalk.s3.us-east-2.amazonaws.com"
+            url = settings.STATIC_URL
 
         return obj.author.dp.url if obj.author.dp else url + "/static/img/img_avatar.png"
 
