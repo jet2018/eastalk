@@ -33,7 +33,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         else:
             url = "https://eastalk.s3.us-east-2.amazonaws.com"
         if is_author:
-            image = user.author.dp.url
+            image = user.author.dp.url if user.author.dp else url+"/static/img/img_avatar.png"
         else:
             image = url+"/static/img/img_avatar.png"
         # Add custom claims

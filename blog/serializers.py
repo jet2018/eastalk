@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from authors.models import Author
 from rest_framework import serializers
@@ -80,7 +81,12 @@ class BlogSerializer(serializers.ModelSerializer):
         ]
 
     def get_poster_image(self, obj):
-        return obj.author.dp.url if obj.author.dp else "/static/img/img_avatar.png"
+        if settings.DEBUG:
+            url = "http://localhost:8000"
+        else:
+            url = "https://eastalk.s3.us-east-2.amazonaws.com"
+
+        return obj.author.dp.url if obj.author.dp else url + "/static/img/img_avatar.png"
 
     def get_full_name(self, obj):
         return obj.author.user.username + " " + obj.author.user.first_name + " " + obj.author.user.last_name
