@@ -40,11 +40,36 @@ class BlogListCreateView(generics.ListCreateAPIView):
         return Blog.objects.filter(Q(schedule_to__lte=now) | Q(schedule_to=None))
 
     def perform_create(self, serializer):
-        if self.request.user.profile.is_author:
-            author_now = Author.objects.get(user=self.request.user)
-            serializer.save(author=author_now)
-        else:
+        try:
+            author = Author.objects.get(user=self.request.user)
+            print(author)
+            return serializer.save(author=author)
+        except Author.DoesNotExist:
             return JsonResponse({"error": "You need to be an author to create an article"})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAuthor])
+def Create_Article(request):
+    """
+        Create a brand new article.
+
+        Must be authenticated and an author.
+    """
+    colors = request.data['colors'] if request.data['colors'] else "i"
+    try:
+        author = Author.objects.get(user=request.user)
+    except Author.DoesNotExist:
+        return JsonResponse({"error": "You have to be an author to proceed."})
+    title = request.data['title']
+    if title == "":
+        return JsonResponse({"error": "A unique title is to your article is required."})
+
+    check_title = Blog.objects.filter(title__iexact=title)
+    if check_title.count() > 3:
+        return JsonResponse({"error": "Only three articles maximumly can have related titles, otherwise, titles are unique"})
+    
+    seriliser = BlogSerializer()
 
 
 class BlogUpdateDeleteRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):

@@ -62,7 +62,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         ]
 
     def get_current_user(self, obj):
-        return obj.user.username + "" + obj.user.first_name + " " + obj.user.last_name
+        return obj.user.first_name + " " + obj.user.last_name+"("+obj.user.username+")"
 
     def get_profile_pik(self, obj):
         url = ""
