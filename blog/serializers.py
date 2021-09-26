@@ -84,7 +84,7 @@ class BlogSerializer(serializers.ModelSerializer):
         if settings.DEBUG:
             url = "http://localhost:8000/static/img/img_avatar.png"
         else:
-            url = settings.CUSTOM_STATIC_URL+"img/img_avatar.png"
+            url = settings.STATIC_URL_CUSTOM+"img/img_avatar.png"
 
         return obj.author.dp.url if obj.author.dp else url
 
