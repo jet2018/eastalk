@@ -75,7 +75,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         else:
             url = settings.STATIC_URL_CUSTOM+"img/img_avatar.png"
 
-        return obj.author.dp.url if obj.author.dp else url
+        return obj.dp.url if obj.dp else url
 
 
 class UserSerializer(serializers.ModelSerializer):

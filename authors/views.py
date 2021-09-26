@@ -28,7 +28,7 @@ class AuthorCreateView(generics.ListCreateAPIView):
     model = Author
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = AuthorSerializer
-    queryset = Author.objects.all()
+    queryset = Author.objects.all().order_by('?')
 
     def perform_create(self, serializer):
         try:
@@ -41,7 +41,7 @@ class AuthorCreateView(generics.ListCreateAPIView):
 class BriefAuthors(generics.ListAPIView):
     serializer_class = AuthorSerializer
     model = Author
-    queryset = Author.objects.all()[:3]
+    queryset = Author.objects.all().order_by('?')[:3]
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
