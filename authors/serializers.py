@@ -31,7 +31,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         if settings.DEBUG:
             url = "http://localhost:8000"
         else:
-            url = "https://d3nzp0pknb17lj.cloudfront.net"
+            url = "https://eastalk.s3.us-east-2.amazonaws.com"
         if is_author:
             image = user.author.dp.url
         else:
