@@ -82,11 +82,11 @@ class BlogSerializer(serializers.ModelSerializer):
 
     def get_poster_image(self, obj):
         if settings.DEBUG:
-            url = "http://localhost:8000/"
+            url = "http://localhost:8000/static/img/img_avatar.png"
         else:
-            url = settings.STATIC_URL
+            url = settings.CUSTOM_STATIC_URL+"img/img_avatar.png"
 
-        return obj.author.dp.url if obj.author.dp else url + "static/img/img_avatar.png"
+        return obj.author.dp.url if obj.author.dp else url
 
     def get_full_name(self, obj):
         return obj.author.user.username + " " + obj.author.user.first_name + " " + obj.author.user.last_name

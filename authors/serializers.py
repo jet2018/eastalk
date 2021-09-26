@@ -29,13 +29,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         token = super().get_token(user)
         if settings.DEBUG:
-            url = "http://localhost:8000/"
+            url = "http://localhost:8000/static/img/img_avatar.png"
         else:
-            url = settings.STATIC_URL
+            url = settings.STATIC_URL_CUSTOM+"img/img_avatar.png"
         if is_author:
-            image = user.author.dp.url if user.author.dp else url+"static/img/img_avatar.png"
+            image = user.author.dp.url if user.author.dp else url
         else:
-            image = url+"static/img/img_avatar.png"
+            image = url
         # Add custom claims
         token['username'] = user.username
         token['image'] = image
@@ -71,11 +71,11 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def get_profile_pik(self, obj):
         if settings.DEBUG:
-            url = "http://localhost:8000/"
+            url = "http://localhost:8000/static/img/img_avatar.png"
         else:
-            url = settings.STATIC_URL
+            url = settings.STATIC_URL_CUSTOM+"img/img_avatar.png"
 
-        return obj.author.dp.url if obj.author.dp else url + "static/img/img_avatar.png"
+        return obj.author.dp.url if obj.author.dp else url
 
 
 class UserSerializer(serializers.ModelSerializer):
