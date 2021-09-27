@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from authors.models import Author
+from django.db import models
+from django.db.models import fields
+from authors.models import Author, Sponsor
 from rest_framework import serializers
 
 from blog.models import Blog, BlogComment, Category, SubCategory, Subscribers
@@ -53,6 +55,14 @@ class SubCategorySerializer(serializers.RelatedField):
         model = SubCategory
 
 
+class CategoriesSerializer(serializers.ModelSerializer):
+    sub_category = SubCategorySerializer(many=True)
+
+    class Meta:
+        model = Category  # the model we working on
+        fields = '__all__'
+
+
 class BlogSerializer(serializers.ModelSerializer):
     """
         Blog serializers
@@ -83,10 +93,12 @@ class BlogSerializer(serializers.ModelSerializer):
     def get_poster_image(self, obj):
         if settings.DEBUG:
             url = "http://localhost:8000/static/img/img_avatar.png"
+            url_short = "http://localhost:8000"
         else:
             url = settings.STATIC_URL_CUSTOM+"img/img_avatar.png"
+            url_short = ""
 
-        return obj.author.dp.url if obj.author.dp else url
+        return url_short+obj.author.dp.url if obj.author.dp else url
 
     def get_full_name(self, obj):
         return obj.author.user.username + " " + obj.author.user.first_name + " " + obj.author.user.last_name
@@ -112,6 +124,8 @@ class SubScriber(serializers.ModelSerializer):
         model = Subscribers
         field = "__all__"
 
-    def save(self):
-        pass
-        #
+
+class SponsorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sponsor
+        field = "__all__"

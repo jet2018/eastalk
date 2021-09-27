@@ -1,5 +1,6 @@
+from authors.serializers import AuthorSerializer, UserSerializer
 from blog.permissions import IsAuthor
-from authors.models import Author
+from authors.models import Author, Sponsor
 import datetime
 
 from django.db.models import Q
@@ -11,9 +12,11 @@ from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
+from django.contrib.auth.models import User
+
 
 from blog.models import Blog, Subscribers, Category
-from blog.serializers import BlogSerializer, CategorySerializer
+from blog.serializers import BlogSerializer, CategoriesSerializer, CategorySerializer, SponsorSerializer
 
 
 # Create your views here.
@@ -68,7 +71,7 @@ def Create_Article(request):
     check_title = Blog.objects.filter(title__iexact=title)
     if check_title.count() > 3:
         return JsonResponse({"error": "Only three articles maximumly can have related titles, otherwise, titles are unique"})
-    
+
     seriliser = BlogSerializer()
 
 
@@ -136,7 +139,7 @@ class GetCategories(generics.ListAPIView):
     """Get all categories in the back"""
     model = Category
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+    serializer_class = CategoriesSerializer
 
 
 # done with fetching categories
@@ -173,3 +176,21 @@ def VoteDown(request, slug):
         return Response({"error": "Blog does not exist"}, status=401)
     serialiser = BlogSerializer(blog)
     return Response(serialiser.data, status=200)
+
+
+class TopSponsors(generics.ListAPIView):
+    model = Sponsor
+    serializer_class = SponsorSerializer
+    queryset = Sponsor.objects.all().order_by('?')[:6]
+
+
+class TopAuthors(generics.ListAPIView):
+    model = Author
+    serializer_class = AuthorSerializer
+    queryset = Author.objects.all().order_by('?')[:6]
+
+
+class TopReaders(generics.ListAPIView):
+    model = User
+    serializer_class = UserSerializer
+    queryset = User.objects.all().order_by('?')[:6]

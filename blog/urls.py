@@ -2,7 +2,7 @@ from django.conf.urls import include
 from django.urls import path
 
 from authors.views import SponsorListOrCreate, BriefSponsors
-from .views import BlogListCreateView, BlogUpdateDeleteRetrieveAPIView, IndexView, Subscribe, GetCategories, MostRecentStories, VoteUp, \
+from .views import BlogListCreateView, BlogUpdateDeleteRetrieveAPIView, IndexView, Subscribe, GetCategories, MostRecentStories, TopAuthors, TopReaders, TopSponsors, VoteUp, \
     VoteDown
 
 app_name = "blog"
@@ -19,5 +19,8 @@ urlpatterns = [
     path("categories/", GetCategories.as_view()),
     path('sponsors/', SponsorListOrCreate.as_view()),
     path('sponsors/brief/', BriefSponsors.as_view()),
+    path("community/top/authors", TopAuthors.as_view()),
+    path("community/top/readers", TopReaders.as_view()),
+    path("community/top/sponsors", TopSponsors.as_view()),
 
 ]
