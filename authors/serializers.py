@@ -86,15 +86,33 @@ class AuthorSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(
         style={'input_type': 'password'}, write_only=True)
+    profile_pik = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['email', 'username',
+        fields = ['email', 'username', 'profile_pik',
                   'first_name', 'last_name', 'password', 'password2']
         extra_kwargs = {
             'password': {'write_only': True},
             'password2': {'write_only': True},
+            'profile_pik': {'read_only': True, 'required': False},
         }
+
+    def get_profile_pik(self, obj):
+        if settings.DEBUG:
+            url = "http://localhost:8000/static/img/img_avatar.png"
+            url_short = "http://localhost:8000"
+        else:
+            url = settings.STATIC_URL_CUSTOM+"img/img_avatar.png"
+            url_short = ""
+
+        # find_user_in_authors
+        try:
+            auth = Author.objects.get(user=obj)
+        except Author.DoesNotExist:
+            return url
+
+        return url_short+obj.author.dp.url if auth.dp else url
 
     def save(self):
         password = self.validated_data['password']
