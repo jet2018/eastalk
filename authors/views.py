@@ -130,43 +130,42 @@ def RegisterAsAuthor(request):
         # check if user already exists
         cur_user = Author.objects.get(user=user)
         if cur_user.verified_user:
-            return Response({"error": "You account is already verified"})
+            return Response({"error": "You already have a verified account."})
         else:
             return Response(
                 {"error": "You still have an unconfirmed author profile, this may take up to 7 working days"})
     except Author.DoesNotExist:
-        pass
-    short_bio = request.POST.get('short_bio')
-    location = request.POST.get("location")
-    dp = request.POST.get("image")
-    profession = request.POST.get("profession")
-    employed = request.POST.get("employed")
-    place_of_employment = request.POST.get("place_of_employment")
-    job_duration = request.POST.get("job_duration")
-    seeking_job = request.POST.get("seeking_job")
+        short_bio = request.POST.get('short_bio')
+        location = request.POST.get("location")
+        dp = request.POST.get("image")
+        profession = request.POST.get("profession")
+        employed = request.POST.get("employed")
+        place_of_employment = request.POST.get("place_of_employment")
+        job_duration = request.POST.get("job_duration")
+        seeking_job = request.POST.get("seeking_job")
 
-    print(employed)
-    print(seeking_job)
+        print(employed)
+        print(seeking_job)
 
-    if employed and seeking_job:
-        return Response(
-            {"error": "You can not have a job and be unemployed at the same time"}, status=401)
-    elif seeking_job and (place_of_employment != "" or job_duration != ""):
-        # if the user indicates where they work, and their job duration, mark them as employed and not seeking!
-        seeking_job = False
-        employed = True
+        if employed and seeking_job:
+            return Response(
+                {"error": "You can not have a job and be unemployed at the same time"}, status=401)
+        elif seeking_job and (place_of_employment != "" or job_duration != ""):
+            # if the user indicates where they work, and their job duration, mark them as employed and not seeking!
+            seeking_job = False
+            employed = True
 
-    author = Author.objects.get_or_create(
-        user=user,
-        short_bio=short_bio,
-        location=location,
-        dp=dp,
-        profession=profession,
-        employed=employed,
-        place_of_employment=place_of_employment,
-        job_duration=job_duration,
-        seeking_job=seeking_job
-    )
-    # print(author)
-    seriliser = AuthorSerializer(author)
-    return Response({"created": seriliser.data, "message": "Author created"})
+        author = Author.objects.get_or_create(
+            user=user,
+            short_bio=short_bio,
+            location=location,
+            dp=dp,
+            profession=profession,
+            employed=employed,
+            place_of_employment=place_of_employment,
+            job_duration=job_duration,
+            seeking_job=seeking_job
+        )
+        # print(author)
+        seriliser = AuthorSerializer(author)
+        return Response({"created": seriliser.data, "message": "Author created"})

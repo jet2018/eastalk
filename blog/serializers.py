@@ -122,10 +122,10 @@ class CommentSerializer(serializers.ModelSerializer):
 class SubScriber(serializers.ModelSerializer):
     class Meta:
         model = Subscribers
-        field = "__all__"
+        fields = "__all__"
 
 
 class SponsorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sponsor
-        field = "__all__"
+        fields = "__all__"

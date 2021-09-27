@@ -30,13 +30,14 @@ class DisplayNameWritableField(serializers.ChoiceField):
 
 def validate_img_extension(value):
     ext = os.path.splitext(value.name)[1]  # [0] returns path+filename
-    valid_extensions = ['.jpg', '.png']
+    valid_extensions = ['.jpg', '.png', '.jpeg']
     if not ext.lower() in valid_extensions:
         raise ValidationError('Unsupported file extension.')
+
 
 def validate_image_size(fieldfile_obj):
     filesize = fieldfile_obj.image.size
     megabyte_limit = 2.0
     if filesize > megabyte_limit*1024*1024:
-        raise ValidationError("Maximum supported file size is %sMB" % str(megabyte_limit))
-
+        raise ValidationError(
+            "Maximum supported file size is %sMB" % str(megabyte_limit))
