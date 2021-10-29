@@ -203,9 +203,6 @@ def ContactUs(request):
     name = request.data['first_name'] + " " + request.data['last_name']
     message = request.data['message']
     email = request.data['email']
-    print(name)
-    print(message)
-    print(email)
     if request.data['first_name'] == "" and request.data['last_name']:
         return JsonResponse({"error": "Your name is not full!!"})
     elif message == "":
