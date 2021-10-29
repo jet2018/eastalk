@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from authors.serializers import AuthorSerializer, UserSerializer
 from blog.permissions import IsAuthor
 from authors.models import Author, Sponsor
@@ -194,3 +196,26 @@ class TopReaders(generics.ListAPIView):
     model = User
     serializer_class = UserSerializer
     queryset = User.objects.all().order_by('?')[:6]
+
+
+@api_view(['POST'])
+def ContactUs(request):
+    name = request.data['first_name'] + " " + request.data['last_name']
+    message = request.data['message']
+    email = request.data['email']
+    print(name)
+    print(message)
+    print(email)
+    if request.data['first_name'] == "" and request.data['last_name']:
+        return JsonResponse({"error": "Your name is not full!!"})
+    elif message == "":
+        return JsonResponse({"error": "Are you submitting an empty message"})
+    elif email == "":
+        return JsonResponse({"error": "Your email is required"})
+    else:
+        sender = send_mail("Tap from "+name, message, email,
+                           [settings.EMAIL_HOST_USER], fail_silently=False,)
+        if sender:
+            return JsonResponse({"success": "Ok, we have received your message"})
+        else:
+            return JsonResponse({"error": "Sorry, we did not receive your message"})
