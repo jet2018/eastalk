@@ -24,10 +24,16 @@ class Author(models.Model):
     seeking_job = models.BooleanField(default=False)
     verified_user = models.BooleanField(default=False)
     registered_on = models.DateTimeField(auto_now=True)
+    followers = models.ManyToManyField(
+        User, related_name="followers", blank=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
+
+    @property
+    def total_followers(self):
+        return self.followers.count()
 
 
 class Sponsor(models.Model):

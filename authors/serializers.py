@@ -55,12 +55,14 @@ class AuthorSerializer(serializers.ModelSerializer):
     """
     current_user = serializers.SerializerMethodField()
     profile_pik = serializers.SerializerMethodField()
+    total_followers = serializers.ReadOnlyField()
 
     class Meta:
         model = Author
         fields = '__all__'
         extra_kwargs = {
             'user': {'required': False},
+            'followers': {'required': False},
         }
         read_only_fields = [
             'slug',

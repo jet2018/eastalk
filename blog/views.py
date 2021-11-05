@@ -146,38 +146,43 @@ class GetCategories(generics.ListAPIView):
 
 # done with fetching categories
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def VoteUp(request, slug):
     user = request.user
+
     try:
+        message = ""
         blog = Blog.objects.get(slug=slug)
         if blog.upvotes.filter(id=user.id).exists():
             blog.upvotes.remove(user)
+            message = "Your thumb-up has been removed from this post"
         else:
             blog.upvotes.add(user)
-
+            message = "You have thumb-upped this article!"
+        total_thumbs_up = blog.total_upvotes
+        return JsonResponse({"success": message, "total": total_thumbs_up})
     except Blog.DoesNotExist:
         return Response({"error": "Blog does not exist"}, status=401)
-    serialiser = BlogSerializer(blog)
-    return Response(serialiser.data, status=200)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def VoteDown(request, slug):
     user = request.user
     try:
+        message = ""
         blog = Blog.objects.get(slug=slug)
         if blog.downvotes.filter(id=user.id).exists():
             blog.downvotes.remove(user)
+            message = "Your thumb-down has been removed from this post"
         else:
             blog.downvotes.add(user)
-
+            message = "You have down-thumbed this article!"
+        total_thumbs_down = blog.total_downvotes
+        return JsonResponse({"success": message, "total": total_thumbs_down})
     except Blog.DoesNotExist:
         return Response({"error": "Blog does not exist"}, status=401)
-    serialiser = BlogSerializer(blog)
-    return Response(serialiser.data, status=200)
 
 
 class TopSponsors(generics.ListAPIView):

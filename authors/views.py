@@ -169,3 +169,24 @@ def RegisterAsAuthor(request):
         # print(author)
         seriliser = AuthorSerializer(author)
         return Response({"created": seriliser.data, "message": "Author created"})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def FollowAuthor(request, pk):
+    """
+        Enables one to follow another by just a button click
+    """
+    try:
+        author = Author.objects.get(pk=pk)
+        message = ""
+        if author.followers.filter(id=request.user.id).exists():
+            author.followers.remove(request.user)
+            message = "You have successfully unfollowed "+author.user.username.capitalize()
+        else:
+            author.followers.add(request.user)
+            message = "You have successfully followed "+author.user.username.capitalize()
+
+        return JsonResponse({"success": message, "followers": author.total_followers})
+    except Author.DoesNotExist:
+        return JsonResponse({"error": "Author does not exist!"})
