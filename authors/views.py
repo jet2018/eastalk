@@ -53,38 +53,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-# @api_view(['POST', ])
-# def create_account(request):
-#     """
-#         Create a new user, requires username, email, password, password2, first_name, last_name, role
-#     """
-#     if request.method == 'POST':
-
-#         if request.POST.get('username') != "" and request.POST.get('email') != "" and request.POST.get(
-#             'password') != "" and request.POST.get(
-#                 'first_name') != "" and request.POST.get('last_name') != "":
-
-#             serializer = UserSerializer(data=request.data)
-#             data = {}
-#             if serializer.is_valid():
-#                 user = serializer.save()
-#                 # if the user is created, update their role, set it to the sent role
-#                 if user:
-#                     data['error'] = "Account created successfully"
-#                     data['email'] = user.email
-#                     data['username'] = user.username
-#                     data['first_name'] = user.first_name
-#                     data['last_name'] = user.last_name
-#                 else:
-#                     data['error'] = "An error occured while creating the user"
-#             else:
-#                 data = serializer.errors
-#             # print(data)
-#             return Response(data)
-#         else:
-#             return Response({"error": "Some fields are missing"})
-
-
 class GetAllUsers(generics.ListAPIView):
     serializer_class = UserSerializer
     model = User
@@ -93,6 +61,36 @@ class GetAllUsers(generics.ListAPIView):
 
 @api_view(['POST', ])
 def create_account(request):
+    """
+        Create a new user account
+
+        Arguments:
+
+            username: String
+            email: String
+            password: String
+            password2: String
+            first_name: String
+            last_name: String
+
+        Returns:
+
+            JsonResponse:
+                {
+                    "user": {
+                        "username": String,
+                        "email": String,
+                        "first_name": String,
+                        "last_name": String,
+                        "is_author": Boolean,
+                        "is_staff": Boolean,
+                        "is_superuser": Boolean,
+                        "id": Integer
+                    }
+                }
+
+        Request method allowed is post only
+    """
     username = request.data['username']
     last_name = request.data['last_name']
     first_name = request.data['first_name']

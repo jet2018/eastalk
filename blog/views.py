@@ -161,7 +161,7 @@ def VoteUp(request, slug):
             blog.upvotes.add(user)
             message = "You have thumb-upped this article!"
         total_thumbs_up = blog.total_upvotes
-        return JsonResponse({"success": message, "total": total_thumbs_up})
+        return JsonResponse({"success": message, "total_likes": total_thumbs_up})
     except Blog.DoesNotExist:
         return Response({"error": "Blog does not exist"}, status=401)
 
@@ -180,7 +180,7 @@ def VoteDown(request, slug):
             blog.downvotes.add(user)
             message = "You have down-thumbed this article!"
         total_thumbs_down = blog.total_downvotes
-        return JsonResponse({"success": message, "total": total_thumbs_down})
+        return JsonResponse({"success": message, "total_likes": total_thumbs_down})
     except Blog.DoesNotExist:
         return Response({"error": "Blog does not exist"}, status=401)
 
@@ -221,3 +221,56 @@ def ContactUs(request):
             return JsonResponse({"success": "Ok, we have received your message"})
         else:
             return JsonResponse({"error": "Sorry, we did not receive your message"})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def Bookmark(request, slug):
+    """
+        Bookmark a blog
+    """
+    user = request.user
+    try:
+        blog = Blog.objects.get(slug=slug)
+        if blog.bookmarks.filter(id=user.id).exists():
+            blog.bookmarks.remove(user)
+            return JsonResponse({"success": "You have removed this post from your bookmarks"})
+        else:
+            blog.bookmarks.add(user)
+            return JsonResponse({"success": "You have added this post to your bookmarks"})
+    except Blog.DoesNotExist:
+        return JsonResponse({"error": "Blog does not exist"})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def TopThreeSavedArticles(request):
+    """
+        Get the top three saved articles
+        Requires authentication to access this endpoint
+    """
+    user = request.user
+    try:
+        blogs = Blog.objects.filter(
+            bookmarks__id=user.id).order_by('-posted_on')[:3]
+        serializer = BlogSerializer(blogs, many=True)
+        return JsonResponse({"success": serializer.data})
+    except Blog.DoesNotExist:
+        return JsonResponse({"error": "Blog does not exist"})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def SavedArticles(request):
+    """
+        Returns all articles saved by the user
+        Requires authentication to access this endpoint 
+    """
+    user = request.user
+    try:
+        blogs = Blog.objects.filter(
+            bookmarks__id=user.id).order_by('-posted_on')
+        serializer = BlogSerializer(blogs, many=True)
+        return JsonResponse({"success": serializer.data})
+    except Blog.DoesNotExist:
+        return JsonResponse({"error": "Blog does not exist"})

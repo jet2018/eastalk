@@ -60,6 +60,8 @@ class Blog(models.Model):
     blog_color = models.CharField(
         choices=colors, null=True, blank=True, max_length=10)
     posted_on = models.DateTimeField(auto_now_add=True)
+    bookmarks = models.ManyToManyField(
+        User, blank=True, related_name="bookmarks")
     upvotes = models.ManyToManyField(
         User, blank=True, related_name="upvoters")
     downvotes = models.ManyToManyField(
@@ -148,18 +150,6 @@ class Subscribers(models.Model):
 
     def __str__(self):
         return self.email
-
-
-class Bookmark(models.Model):
-    """
-        User's saved articles
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    bookmarked_on = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.user.username
 
 
 class ReadArticles(models.Model):
