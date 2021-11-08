@@ -234,10 +234,10 @@ def Bookmark(request, slug):
         blog = Blog.objects.get(slug=slug)
         if blog.bookmarks.filter(id=user.id).exists():
             blog.bookmarks.remove(user)
-            return JsonResponse({"success": "You have removed this post from your bookmarks"})
+            return JsonResponse({"success": "You have removed this post from your bookmarks", "bookmarked": False})
         else:
             blog.bookmarks.add(user)
-            return JsonResponse({"success": "You have added this post to your bookmarks"})
+            return JsonResponse({"success": "You have added this post to your bookmarks", "bookmarked": True})
     except Blog.DoesNotExist:
         return JsonResponse({"error": "Blog does not exist"})
 
