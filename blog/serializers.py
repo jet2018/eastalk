@@ -35,7 +35,7 @@ class CategorySerializer(serializers.RelatedField):
 class SubCategorySerializer(serializers.RelatedField):
 
     def to_representation(self, value):
-        return {"sub_category_name": value.sub_category_name, "icon": value.icon}
+        return {"id": value.id, "sub_category_name": value.sub_category_name, "icon": value.icon}
 
     def get_queryset(self):
         queryset = SubCategory.objects.all()
