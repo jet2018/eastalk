@@ -49,7 +49,7 @@ class Blog(models.Model):
     colors = [("r", "danger"), ("s", "success"),
               ("i", "info"), ]
     title = models.CharField(
-        max_length=250, help_text="Unique, catchy topic of the article", unique=True, null=True, blank=True)
+        max_length=250, help_text="Unique, catchy topic of the article", null=True, blank=True)
     body = CKEditor5Field(
         'Add a body', help_text="Full body of the article, supports markup", config_name='default', null=True,
         blank=True)

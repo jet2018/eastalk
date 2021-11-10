@@ -2,12 +2,13 @@ from django.conf.urls import include
 from django.urls import path
 
 from authors.views import SponsorListOrCreate, BriefSponsors
-from .views import BlogListCreateView, BlogUpdateDeleteRetrieveAPIView, Bookmark, ContactUs, IndexView, SavedArticles, Subscribe, GetCategories, MostRecentStories, TopAuthors, TopReaders, TopSponsors, VoteUp, VoteDown
+from .views import BlogListView, BlogUpdateDeleteRetrieveAPIView, Bookmark, ContactUs, CreateArticle, IndexView, SavedArticles, Subscribe, GetCategories, MostRecentStories, TopAuthors, TopReaders, TopSponsors, VoteUp, VoteDown
 
 app_name = "blog"
 urlpatterns = [
     path('', IndexView.as_view(), name="splash"),
-    path('articles', BlogListCreateView.as_view()),
+    path('articles', BlogListView.as_view()),
+    path('create/', CreateArticle),
     path('article/<slug>/', BlogUpdateDeleteRetrieveAPIView.as_view()),
     path('articles/brief/', MostRecentStories.as_view()),
     path('articles/save/<slug>', Bookmark),

@@ -82,6 +82,9 @@ class BlogSerializer(serializers.ModelSerializer):
         model = Blog  # the model we working on
         fields = '__all__'  # including all fields at ago
         # these fields will be read, but a user can't add anything on them.
+        extra_kwargs = {
+            'author': {'required': False},
+        }
         read_only_fields = [
             'slug',
             'poster_image',
