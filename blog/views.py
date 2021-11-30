@@ -82,14 +82,14 @@ def CreateArticle(request):
     schedule_to = request.data['schedule_to'] if request.data['schedule_to'] and int(
         request.data['schedule_to']) > 0 else None
     if schedule_to:
-        schedule_to = now+int(schedule_to)
+        new_date = now+int(schedule_to)
     else:
-        schedule_to = now
+        new_date = now
     # saving an article
     article = Blog.objects.create(
         title=title,
         author=author,
-        schedule_to=schedule_to,
+        schedule_to=new_date,
         body=body,
         blog_color=colors,
         introductory_file=introductory_file

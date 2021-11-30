@@ -1,2 +1,3 @@
-{% extends "rest_framework/base.html" %} {% load static %} {% block title %} AfricanTalks API {% endblock title %} {% block bootstrap_navbar_variant %}{% endblock %} {% block branding %}
+{% extends "rest_framework/base.html" %} {%load static %} {% block bootstrap_theme %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css">{% endblock %} {% block title %} AfricanTalks API {% endblock title %} {% block bootstrap_navbar_variant %}{% endblock %} {% block branding %}
 <img src="{% static 'img/mainlogo.png' %}" width="150" alt="African Talks logo">{% endblock %}
