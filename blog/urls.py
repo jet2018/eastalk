@@ -2,7 +2,7 @@ from django.conf.urls import include
 from django.urls import path
 
 from authors.views import SponsorListOrCreate, BriefSponsors
-from .views import BlogListView, BlogUpdateDeleteRetrieveAPIView, Bookmark, ContactUs, CreateArticle, IndexView, SavedArticles, Subscribe, GetCategories, MostRecentStories, TopAuthors, TopReaders, TopSponsors, VoteUp, VoteDown
+from .views import BlogListView, BlogUpdateDeleteRetrieveAPIView, Bookmark, ContactUs, CreateArticle, DeleteArticle, IndexView, SavedArticles, Subscribe, GetCategories, MostRecentStories, TopAuthors, TopReaders, TopSponsors, UserArticles, VoteUp, VoteDown
 
 app_name = "blog"
 urlpatterns = [
@@ -23,5 +23,7 @@ urlpatterns = [
     path("community/top/authors", TopAuthors.as_view()),
     path("community/top/readers", TopReaders.as_view()),
     path("community/top/sponsors", TopSponsors.as_view()),
-    path("contact_us/", ContactUs)
+    path("contact_us/", ContactUs),
+    path("articles/activity", UserArticles.as_view()),
+    path("article/<pk>/delete", DeleteArticle.as_view())
 ]

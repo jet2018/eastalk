@@ -21,8 +21,9 @@ from blog.models import Blog, SubCategory, Subscribers, Category
 from blog.serializers import BlogSerializer, CategoriesSerializer, CategorySerializer, SponsorSerializer
 now = datetime.datetime.now()
 
-
 # Create your views here.
+
+
 class IndexView(TemplateView):
     template_name = "splash.html"
 
@@ -42,7 +43,7 @@ class BlogListView(generics.ListAPIView):
 
     def get_queryset(self):
         now = datetime.datetime.now()
-        return Blog.objects.filter(Q(schedule_to__lte=now) | Q(schedule_to=None))
+        return Blog.objects.filter(Q(schedule_to__lte=now) | Q(schedule_to=None)).exclude(is_draft=True).order_by("?")
 
 
 @api_view(['POST'])
@@ -78,10 +79,17 @@ def CreateArticle(request):
     if body == "":
         return JsonResponse({"error": "The body of your article is required."})
 
+    schedule_to = request.data['schedule_to'] if request.data['schedule_to'] else 0
     # scheduling
-    schedule_to = request.data['schedule_to'] if request.data['schedule_to'] and int(
-        request.data['schedule_to']) > 0 else None
-    if schedule_to:
+    # schedule_to = request.data['schedule_to'] if request.data['schedule_to'] and int(
+    #     request.data['schedule_to']) > 0 else None
+    is_draft = False
+
+    if str(request.data['is_draft']) == "true":
+        is_draft = True
+    # is_draft = request.data['is_draft']
+
+    if schedule_to and int(schedule_to) > 0:
         new_date = now+int(schedule_to)
     else:
         new_date = now
@@ -89,10 +97,11 @@ def CreateArticle(request):
     article = Blog.objects.create(
         title=title,
         author=author,
-        schedule_to=new_date,
+        schedule_to=new_date.date(),
         body=body,
         blog_color=colors,
-        introductory_file=introductory_file
+        introductory_file=introductory_file,
+        is_draft=is_draft
     )
     # get categories
     categories = list(request.data['categories'])
@@ -107,28 +116,10 @@ def CreateArticle(request):
             article.sub_category.add(id)
 
     blog = BlogSerializer(article)
-    return JsonResponse({"success": "Article created successfully", "blog": blog.data})
-
-
-# now = datetime.datetime.now()
-# print(now)
-# print(now + datetime.timedelta(days=3))
-# print(datetime.datetime.date(datetime.timedelta(days=3)))
-
-# create a new article
-# class CreateArticle(generics.CreateAPIView):
-#     """
-#         Create a brand new article.
-#         Must be authenticated and an author.
-#     """
-#     permission_classes = [IsAuthenticated, IsAuthor]
-#     model = Blog
-#     serializer_class = BlogSerializer
-#     queryset = Blog.objects.all()
-
-#     def perform_create(self, serializer):
-#         author = Author.objects.get(user=self.request.user)
-#         serializer.save(author=author)
+    if article.is_draft:
+        return JsonResponse({"success": "Article saved successfully, you can publish it later.", "blog": blog.data})
+    else:
+        return JsonResponse({"success": "Article created successfully", "blog": blog.data})
 
 
 class BlogUpdateDeleteRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -275,7 +266,7 @@ def Bookmark(request, slug):
         blog = Blog.objects.get(slug=slug)
         if blog.bookmarks.filter(id=user.id).exists():
             blog.bookmarks.remove(user)
-            return JsonResponse({"success": "You have removed this post from your bookmarks", "bookmarked": False})
+            return JsonResponse({"success": "You have removed this article from your bookmarks", "bookmarked": False})
         else:
             blog.bookmarks.add(user)
             return JsonResponse({"success": "You have added this post to your bookmarks", "bookmarked": True})
@@ -315,3 +306,27 @@ def SavedArticles(request):
         return JsonResponse({"success": serializer.data})
     except Blog.DoesNotExist:
         return JsonResponse({"error": "Blog does not exist"})
+
+
+class UserArticles(generics.ListAPIView):
+    """
+        Get all articles 
+    """
+    model = Blog
+    permission_classes = [IsAuthenticated]
+    serializer_class = BlogSerializer
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ["title", "author__user__username",
+                     "category__category_name", "sub_category__sub_category_name"]
+    filterset_fields = ["title", "author__user__username",
+                        "category__category_name", "sub_category__sub_category_name"]
+
+    def get_queryset(self):
+        return Blog.objects.filter(author__user=self.request.user).order_by("-posted_on")
+
+
+class DeleteArticle(generics.DestroyAPIView):
+    model = Blog
+    queryset = Blog.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = BlogSerializer

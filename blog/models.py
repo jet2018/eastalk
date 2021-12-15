@@ -75,6 +75,7 @@ class Blog(models.Model):
         null=True, help_text="If you are want to schedule the blog to a future date.", blank=True)
     contributors = models.ManyToManyField(
         Author, blank=True, related_name="coauthors")
+    is_draft = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

@@ -87,6 +87,7 @@ class BlogSerializer(serializers.ModelSerializer):
         }
         read_only_fields = [
             'slug',
+            'is_draft',
             'poster_image',
             'full_name',
             'blog_color',
